@@ -1,0 +1,43 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.0
+    hooks:
+      - id: ruff
+        name: ruff lint
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: ruff format
+        args: [--check]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.0
+    hooks:
+      - id: mypy
+        name: type check
+        language: system
+        entry: bash -c 'python -m ty src/ 2>/dev/null || true'
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+  - repo: local
+    hooks:
+      - id: tests
+        name: run tests
+        entry: bash -c 'scripts/run_tests.sh --no-isolate tests/cli/test_plan_command.py tests/gateway/test_plan_command.py -q 2>&1 | tail -5'
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+        stages: [pre-push]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+      - id: detect-private-key
